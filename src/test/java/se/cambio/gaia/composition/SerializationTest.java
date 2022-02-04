@@ -6,6 +6,7 @@ import org.ehrbase.client.classgenerator.shareddefinition.Language;
 import org.ehrbase.client.classgenerator.shareddefinition.Setting;
 import org.ehrbase.client.classgenerator.shareddefinition.Territory;
 import org.ehrbase.client.flattener.Unflattener;
+import org.ehrbase.serialisation.jsonencoding.CanonicalJson;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.Test;
@@ -15,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import se.cambio.gaia.cdr.composition.mapper.ArchieObjectMapperFactory;
 import se.cambio.gaia.composition.analytereport8composition.AnalyteReport8Composition;
 import se.cambio.gaia.composition.analytereport8composition.definition.*;
 import se.cambio.gaia.composition.support.TestTemplateProvider;
@@ -38,9 +38,8 @@ public class SerializationTest {
         AnalyteReport8Composition analyteComposition = createAnalyteComposition();
         Unflattener unflattener = new Unflattener(new TestTemplateProvider());
         Composition composition = (Composition) unflattener.unflatten(analyteComposition);
-        String serializedComposition =
-                ArchieObjectMapperFactory.getArchieObjectMapper()
-                        .writeValueAsString(composition);
+        CanonicalJson cut = new CanonicalJson();
+        String serializedComposition = cut.marshal(composition);
         String testComposition = IOUtils.toString(
                 analyteCompositionResource.getInputStream(), StandardCharsets.UTF_8);
         assertThat(serializedComposition, equalTo(testComposition));
