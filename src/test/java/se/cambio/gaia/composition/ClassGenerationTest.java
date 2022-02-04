@@ -1,7 +1,6 @@
 package se.cambio.gaia.composition;
 
 import com.squareup.javapoet.JavaFile;
-import org.apache.xmlbeans.XmlException;
 import org.ehrbase.client.classgenerator.ClassGenerator;
 import org.ehrbase.client.classgenerator.ClassGeneratorConfig;
 import org.ehrbase.client.classgenerator.ClassGeneratorResult;
@@ -9,35 +8,24 @@ import org.ehrbase.client.classgenerator.FieldGenerator;
 import org.ehrbase.webtemplate.model.WebTemplate;
 import org.ehrbase.webtemplate.parser.OPTParser;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openehr.schemas.v1.OPERATIONALTEMPLATE;
-import org.openehr.schemas.v1.TemplateDocument;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import se.cambio.gaia.composition.support.TestTemplateProvider;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ClassGenerationTest.TestConfig.class)
 public class ClassGenerationTest {
-
-    @Value("opt/Analyte_Report_8.opt")
-    Resource analyteReportOpt;
 
     public static final String GENERATED_CLASS_PATH = "generated-classes";
     public static final String PACKAGE_NAME = "se.cambio.gaia.composition";
+    public static final String TEMPLATE_NAME = "Analyte_Report_8";
 
     @Test
-    public void shouldGenerateClassesFromOpt() throws IOException, XmlException {
+    public void shouldGenerateClassesFromOpt() throws IOException {
+        TestTemplateProvider testTemplateProvider = new TestTemplateProvider();
         OPERATIONALTEMPLATE template =
-                TemplateDocument.Factory.parse(
-                                analyteReportOpt.getInputStream())
-                        .getTemplate();
+                testTemplateProvider.find(TEMPLATE_NAME).get();
         WebTemplate webTemplate = new OPTParser(template).parse();
         ClassGeneratorConfig config = new ClassGeneratorConfig();
         config.setAddNullFlavor(true);
@@ -52,10 +40,5 @@ public class ClassGenerationTest {
         List<JavaFile> generateFiles = generate.writeFiles(path);
         FieldGenerator fieldGenerator = new FieldGenerator();
         fieldGenerator.generate(generateFiles).writeFiles(path);
-    }
-
-    @Configuration
-    static class TestConfig {
-
     }
 }

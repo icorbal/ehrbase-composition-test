@@ -1,7 +1,6 @@
 package se.cambio.gaia.composition;
 
 import com.nedap.archie.rm.composition.Composition;
-import org.apache.commons.io.IOUtils;
 import org.ehrbase.client.classgenerator.shareddefinition.Language;
 import org.ehrbase.client.classgenerator.shareddefinition.Setting;
 import org.ehrbase.client.classgenerator.shareddefinition.Territory;
@@ -10,28 +9,17 @@ import org.ehrbase.serialisation.jsonencoding.CanonicalJson;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.cambio.gaia.composition.analytereport8composition.AnalyteReport8Composition;
 import se.cambio.gaia.composition.analytereport8composition.definition.*;
+import se.cambio.gaia.composition.support.TestJsonCompositionProvider;
 import se.cambio.gaia.composition.support.TestTemplateProvider;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SerializationTest.TestConfig.class)
 public class SerializationTest {
-
-    @Value("composition/analyte.json")
-    Resource analyteCompositionResource;
 
     @Test
     public void shouldSerializeComposition() throws IOException {
@@ -40,8 +28,9 @@ public class SerializationTest {
         Composition composition = (Composition) unflattener.unflatten(analyteComposition);
         CanonicalJson cut = new CanonicalJson();
         String serializedComposition = cut.marshal(composition);
-        String testComposition = IOUtils.toString(
-                analyteCompositionResource.getInputStream(), StandardCharsets.UTF_8);
+
+        TestJsonCompositionProvider compositionProvider = new TestJsonCompositionProvider();
+        String testComposition = compositionProvider.find("analyte");
         assertThat(serializedComposition, equalTo(testComposition));
     }
 
@@ -75,10 +64,5 @@ public class SerializationTest {
         cluster.setAnalyteResultMagnitude(23.12);
         cluster.setAnalyteResultUnits("mg");
         return analyteComposition;
-    }
-
-    @Configuration
-    static class TestConfig {
-
     }
 }
