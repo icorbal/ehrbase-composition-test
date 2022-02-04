@@ -1,6 +1,7 @@
 package se.cambio.gaia.composition;
 
 import com.squareup.javapoet.JavaFile;
+import static java.lang.String.format;
 import org.ehrbase.client.classgenerator.ClassGenerator;
 import org.ehrbase.client.classgenerator.ClassGeneratorConfig;
 import org.ehrbase.client.classgenerator.ClassGeneratorResult;
@@ -9,6 +10,8 @@ import org.ehrbase.webtemplate.model.WebTemplate;
 import org.ehrbase.webtemplate.parser.OPTParser;
 import org.junit.Test;
 import org.openehr.schemas.v1.OPERATIONALTEMPLATE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.cambio.gaia.composition.support.TestTemplateProvider;
 
 import java.io.IOException;
@@ -20,6 +23,8 @@ public class ClassGenerationTest {
     public static final String GENERATED_CLASS_PATH = "generated-classes";
     public static final String PACKAGE_NAME = "se.cambio.gaia.composition";
     public static final String TEMPLATE_NAME = "Analyte_Report_8";
+
+    Logger logger = LoggerFactory.getLogger(ClassGenerationTest.class);
 
     @Test
     public void shouldGenerateClassesFromOpt() throws IOException {
@@ -40,7 +45,7 @@ public class ClassGenerationTest {
 
     private void writeFiles(ClassGeneratorResult generate) throws IOException {
         Path path = Path.of(GENERATED_CLASS_PATH);
-        System.out.println("Writing generated classes to: " + path.toUri());
+        logger.info(format("Writing generated classes to: %s ", path.toUri()));
         List<JavaFile> generateFiles = generate.writeFiles(path);
         FieldGenerator fieldGenerator = new FieldGenerator();
         fieldGenerator.generate(generateFiles).writeFiles(path);
