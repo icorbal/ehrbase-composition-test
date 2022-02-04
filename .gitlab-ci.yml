@@ -1,0 +1,19 @@
+image: docker:latest
+services:
+  - docker:dind
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+stages:
+  - build
+  - deploy
+  - release
+  
+maven-build-snapshot:
+  image: gitlab.gaiadev.xyz:4567/infrastructure/docker-builder
+  stage: build
+  script:
+      - mvn clean install 
+  except:
+    - /^release-.*$/
+    - tags
