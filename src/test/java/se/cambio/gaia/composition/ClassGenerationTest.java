@@ -26,6 +26,10 @@ public class ClassGenerationTest {
         TestTemplateProvider testTemplateProvider = new TestTemplateProvider();
         OPERATIONALTEMPLATE template =
                 testTemplateProvider.find(TEMPLATE_NAME).get();
+        generateOptClasses(template);
+    }
+
+    private void generateOptClasses(OPERATIONALTEMPLATE template) throws IOException {
         WebTemplate webTemplate = new OPTParser(template).parse();
         ClassGeneratorConfig config = new ClassGeneratorConfig();
         config.setAddNullFlavor(true);
